@@ -1,7 +1,7 @@
 import UserProfile from '../components/UserProfile';
 import PayPalPayment from '../components/PayPalPayment';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { redirect } from 'next/navigation';
 
 export default async function SettingsPage() {

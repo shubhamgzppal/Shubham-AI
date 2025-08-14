@@ -1,9 +1,11 @@
 import { NextRequest } from 'next/server';
-import { chatModel } from '../../../../app/env';
+import { chatModel } from '@/app/env';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { authOptions } from '@/app/lib/auth';
 import { Message, Conversation } from '../../../models/Chat';
-import { connectToDatabase } from '../../../lib/mongodb';
+import { connectToDatabase } from '@/app/lib/mongodb';
+import { HydratedDocument } from 'mongoose';
+import { IMessage, IConversation } from '../../../types/models';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,19 +18,28 @@ export async function POST(req: NextRequest) {
     const { prompt, conversationId } = await req.json();
     
     // Create a new conversation if none exists
-    let conversation = conversationId ? 
-      await Conversation.findById(conversationId) :
-      await Conversation.create({
+    let conversation: HydratedDocument<IConversation>;
+    
+    if (conversationId) {
+      conversation = await Conversation.findById(conversationId);
+      if (!conversation) {
+        return new Response('Conversation not found', { status: 404 });
+      }
+    } else {
+      conversation = await Conversation.create({
         userId: session.user.id,
-        title: prompt.slice(0, 30) + '...'
+        title: prompt.slice(0, 30) + '...',
+        lastMessageAt: new Date()
       });
+    }
 
     // Save user message
     await Message.create({
       conversationId: conversation._id,
       role: 'user',
-      content: prompt
-    });
+      content: prompt,
+      createdAt: new Date()
+    } as IMessage);
 
     // Stream response
     const encoder = new TextEncoder();
@@ -42,8 +53,10 @@ export async function POST(req: NextRequest) {
     // Process the stream
     (async () => {
       try {
+        let fullResponse = '';
         for await (const chunk of response.stream) {
           const text = chunk.text();
+          fullResponse += text;
           await writer.write(encoder.encode(text));
         }
         
@@ -51,11 +64,13 @@ export async function POST(req: NextRequest) {
         await Message.create({
           conversationId: conversation._id,
           role: 'assistant',
-          content: await response.response.text()
-        });
+          content: fullResponse,
+          createdAt: new Date()
+        } as IMessage);
         
         writer.close();
       } catch (error) {
+        console.error('Stream processing error:', error);
         writer.abort(error);
       }
     })();
