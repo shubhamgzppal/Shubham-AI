@@ -1,0 +1,39 @@
+{
+  "name": "shubham-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.10.0",
+    "@google/generative-ai": "^0.24.1",
+    "@paypal/react-paypal-js": "^8.8.3",
+    "@popperjs/core": "^2.11.8",
+    "@types/uuid": "^10.0.0",
+    "bootstrap": "^5.3.7",
+    "formidable": "^3.5.4",
+    "mongodb": "^6.18.0",
+    "mongoose": "^8.17.1",
+    "next": "^15.4.5",
+    "next-auth": "^4.24.11",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "server-only": "^0.0.1",
+    "sharp": "^0.34.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/cookie": "^0.6.0",
+    "@types/node": "^20.19.9",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@types/webidl-conversions": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^13.5.11",
+    "typescript": "^5.9.2"
+  }
+}
