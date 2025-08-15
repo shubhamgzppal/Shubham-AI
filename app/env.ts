@@ -66,9 +66,12 @@ export const fallbackChatModel = createModel({
   generationConfig: defaultConfig,
 });
 
-export const imageModel = createModel({
+export const imageModel = genAI.getGenerativeModel({
   model: process.env.AI_IMAGE_MODEL || 'gemini-2.0-flash-preview-image-generation',
-  generationConfig: defaultConfig,
+  generationConfig: {
+    ...defaultConfig,
+    temperature: 0.4,
+  },
 });
 
 export const startChat = async () => {
